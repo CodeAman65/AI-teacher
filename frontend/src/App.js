@@ -25,7 +25,7 @@
 // export default App;
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import ReactPlayer from "react-player";
+import LiveSessionState from "./LiveSessionState";
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
@@ -726,7 +726,7 @@ function PlayingState({ videoUrl, scriptText, attempt, onRetry, jobData }) {
         )}
       </div>
 
-      {/* Video Player */}
+      {/* Audio Player (Podcast Style) */}
       <div
         style={{
           borderRadius: 16,
@@ -736,18 +736,45 @@ function PlayingState({ videoUrl, scriptText, attempt, onRetry, jobData }) {
           marginBottom: 20,
           position: "relative",
           background: "#0a0f1a",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: 40
         }}
       >
-        <ReactPlayer
-          url={videoUrl}
-          playing={isPlaying}
+        <div style={{ position: "relative", display: "inline-block", marginBottom: 30 }}>
+          <div
+            style={{
+              width: 120,
+              height: 120,
+              borderRadius: "50%",
+              background: `linear-gradient(135deg, #1a2744, #0f172a)`,
+              border: `3px solid #10b981`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 60,
+              boxShadow: isPlaying ? `0 0 40px rgba(16,185,129,0.4), 0 0 80px rgba(16,185,129,0.2)` : "none",
+              animation: isPlaying ? "pulse-dot 2s infinite" : "none",
+            }}
+          >
+            👩‍🏫
+          </div>
+        </div>
+        
+        <audio
+          key={videoUrl}
           controls
-          width="100%"
-          height="auto"
-          style={{ display: "block", aspectRatio: "16/9" }}
-          onPause={() => setIsPlaying(false)}
+          autoPlay
+          style={{ width: "100%", outline: "none" }}
           onPlay={() => setIsPlaying(true)}
-        />
+          onPause={() => setIsPlaying(false)}
+          onEnded={() => setIsPlaying(false)}
+        >
+          <source src={videoUrl} type="video/mp4" />
+          <source src={videoUrl} type="audio/wav" />
+          Your browser does not support the audio tag.
+        </audio>
       </div>
 
       {/* Script Card */}
@@ -876,9 +903,7 @@ export default function App() {
   const handleStart = async ({ subject, chapter, doubt }) => {
     setError(null);
     setJobData({ subject, chapter, doubt });
-    setState("loading");
-    setAttempt(1);
-
+    setState("live"); return; 
     try {
       const res = await fetch("http://localhost:8000/teach", {
         method: "POST",
@@ -1118,6 +1143,7 @@ export default function App() {
         <main style={{ flex: 1, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "24px 16px 48px" }}>
           {state === "idle" && <IdleState onStart={handleStart} />}
           {state === "loading" && <LoadingState jobData={jobData} onCancel={handleCancel} />}
+          {state === "live" && <LiveSessionState jobData={jobData} onCancel={handleCancel} />}
           {state === "playing" && (
             <PlayingState
               videoUrl={videoUrl}

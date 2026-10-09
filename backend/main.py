@@ -7,6 +7,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
+import live
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -32,11 +33,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
+app.include_router(live.router)
+
 # CORS — allow React frontend on any port
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -112,21 +115,13 @@ def run_full_pipeline(
     update_job("Awaaz record ho rahi hai...")
     audio = generate_voice(script["clean_text"])
 
-    # Step 5: Generate avatar video via D-ID
-    update_job("Video ban raha hai...")
-    video_bytes = generate_avatar_video(audio)
+    # Step 5: Generate avatar video via D-ID (BYPASSED due to credit limits)
+    update_job("Voice upload ho rahi hai...")
+    from avatar import upload_audio_to_cloudinary
+    # We just upload the audio to Cloudinary and use that URL as the video URL
+    video_url = upload_audio_to_cloudinary(audio)
 
-    # Step 6: Save video to disk
-    video_filename = f"{uuid.uuid4().hex}.mp4"
-    video_path     = VIDEOS_DIR / video_filename
-    with open(video_path, "wb") as f:
-        f.write(video_bytes)
-
-    # Build the public URL
-    base_url  = os.getenv("BASE_URL", "http://localhost:8000")
-    video_url = f"{base_url}/videos/{video_filename}"
-
-    print(f"  ✓ Video saved: {video_filename}")
+    print(f"  [OK] Audio hosted at Cloudinary: {video_url}")
 
     return {
         "video_url":   video_url,
@@ -205,7 +200,7 @@ async def teach(
         cached_video = None
 
     if cached_video:
-        print(f"  ✓ Cache hit — returning instantly")
+        print(f"  [OK] Cache hit — returning instantly")
         return JSONResponse({
             "video_url": cached_video,
             "script":    "",

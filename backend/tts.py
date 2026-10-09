@@ -472,13 +472,13 @@ def call_sarvam_api(text: str) -> bytes:
     payload = {
         "inputs": [text],
         "target_language_code": "hi-IN",
-        "speaker": "anushka",          # Female teacher voice
+        "speaker": "priya",          # Female teacher voice
         "pitch": 0,                  # Natural pitch
         "pace": 0.85,                # Slightly slower — better for learning
         "loudness": 1.4,             # Clear volume
         "speech_sample_rate": 22050,
         "enable_preprocessing": True,
-        "model": "bulbul:v2"
+        "model": "bulbul:v3"
     }
 
     response = requests.post(

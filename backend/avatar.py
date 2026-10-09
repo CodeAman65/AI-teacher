@@ -483,7 +483,7 @@ def upload_audio_to_cloudinary(audio_bytes: bytes) -> str:
             resource_type="video",       # Cloudinary uses "video" for audio files
             folder="ai_teacher_audio",
             overwrite=True,
-            format="wav"
+            format="mp4"
         )
         audio_url = result["secure_url"]
         print(f"  ✓ Audio hosted at: {audio_url}")

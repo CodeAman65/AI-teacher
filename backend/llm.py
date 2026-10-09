@@ -291,7 +291,7 @@ Do NOT write in full English. Mix Hindi words naturally like the examples.
 """
 
     response = groq_client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="qwen/qwen3.8-27b",
         max_tokens=450,
         temperature=0.8,
         messages=[

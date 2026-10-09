@@ -28,7 +28,7 @@ pinecone_index = pinecone_client.Index(
 # MUST be the same model, outputs 384 dimensions
 print("Loading embedding model...")
 embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-print("✓ Embedding model ready")
+print("[OK] Embedding model ready")
 
 
 def normalize_query(raw_input: str) -> str:
@@ -42,7 +42,7 @@ def normalize_query(raw_input: str) -> str:
         "respiration class 10"      → "Respiration"
     """
     response = groq_client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="openai/gpt-oss-20b",
         max_tokens=30,
         temperature=0,
         messages=[
@@ -193,7 +193,7 @@ if __name__ == "__main__":
         context = get_context(clean)
         print(f"Context retrieved: {len(context)} characters")
         print(f"Preview: {context[:300]}...")
-        print("\n✓ Full pipeline working correctly!")
+        print("\n[OK] Full pipeline working correctly!")
     except Exception as e:
         print(f"ERROR in pipeline: {e}")
 
